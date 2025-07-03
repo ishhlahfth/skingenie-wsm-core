@@ -62,11 +62,15 @@ def main_process(data, weights, user_input):
         df = preprocess_data(df)
 
         all_recommendation = weight_scoring_process(df)
-        user_score = scoring_userdata(user_input, weights)
-        recommended_product_id = all_recommendation.loc[(
-            all_recommendation['score'] - user_score).abs().idxmin(), 'id']
+        # user_score = scoring_userdata(user_input, weights)
+        # location = (all_recommendation['score'] - user_score).abs().idxmin()
+        rec = []
+        for item in all_recommendation['id'][:5]:
+            rec.append(item)
+        
+
         response = {
-            'recommended_id': recommended_product_id
+            'recommended_id': rec, 
         }
         return response_wrapper(response, 200, 'Ok')
     except Exception as e:
