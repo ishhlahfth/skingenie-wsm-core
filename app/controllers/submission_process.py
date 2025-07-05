@@ -55,22 +55,28 @@ def scoring_userdata(user_input, weights):
         nPrice * cWeight['price']) + (nRecommend * cWeight['recommend'])
     return userScore
 
-
 def main_process(data, weights, user_input):
     try:
         df = pd.DataFrame(data)
         df = preprocess_data(df)
 
         all_recommendation = weight_scoring_process(df)
-        # user_score = scoring_userdata(user_input, weights)
-        # location = (all_recommendation['score'] - user_score).abs().idxmin()
+
+        # SINGLE RECOMMENDATION FLOW
+        user_score = scoring_userdata(user_input, weights)
+        location = (all_recommendation['score'] - user_score).abs().idxmin()
+
+
+        recommended_product_id = all_recommendation.loc[location, 'id']
+
+        # print(all_recommendation.sort_values(by='score', ascending=False)['id'][:5])
         rec = []
-        for item in all_recommendation['id'][:5]:
+        for item in all_recommendation.sort_values(by='score').drop_duplicates(subset='id')['id'][:4]:
             rec.append(item)
-        
 
         response = {
-            'recommended_id': rec, 
+            'recommended_id': recommended_product_id,
+            'other': rec,
         }
         return response_wrapper(response, 200, 'Ok')
     except Exception as e:
